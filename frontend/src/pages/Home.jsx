@@ -31,7 +31,7 @@ function Home() {
 
             {/* Main Content - Scrollable */}
             <div className='w-full md:w-[80%] ml-auto h-screen overflow-y-auto p-2 md:p-5'>
-                <h1 className="text-center mt-20 md:mt-0 text-2xl font-bold flex items-center justify-center pb-3 border-b-[1px] border-gray-300 ">
+                <h1 className="fixed bg-white z-10 w-full md:w-[80%] text-center top-0 pt-20 md:pt-3 text-2xl font-bold flex items-center justify-center pb-3 border-b-[1px] border-gray-300 ">
                     {tabInfo[activeTab] ? tabInfo[activeTab]?.icon :
                         <FaRegFolderOpen className="inline-block mr-2 text-violet-600" />
                     }
@@ -46,7 +46,7 @@ function Home() {
             </div>
 
             {/* Mobile Navbar - Only visible on small screens */}
-            <div className='fixed top-0 w-full bg-gray-800 md:hidden'>
+            <div className='fixed top-0 w-full bg-gray-800 z-20 md:hidden'>
                 <Sidebar />
             </div>
         </div>
