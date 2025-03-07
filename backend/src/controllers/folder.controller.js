@@ -11,7 +11,7 @@ export const addFolder = async (req, res, next) => {
         }
 
         if (!folderName) {
-            return next(new ErrorHandler(400, "Folder name are required."));
+            return next(new ErrorHandler(400, "Folder name is required."));
         }
 
         const user = await User.findById(req.user.userId);
@@ -39,7 +39,7 @@ export const addFolder = async (req, res, next) => {
 // ------------------------ DELETE Folder --------------------------
 export const deleteFolder = async (req, res, next) => {
     try {
-        const { folderName } = req.body;
+        const folderName = req.query.folderName;
 
         if (!req.user) {
             return next(new ErrorHandler(401, "Unauthorized, You are not allowed to perform this task."));

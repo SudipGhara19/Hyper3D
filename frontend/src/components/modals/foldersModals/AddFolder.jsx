@@ -35,7 +35,7 @@ function AddFolder({ showModal, setShowModal }) {
             }
 
             dispatch(setFoldersData(response.folders));
-            toast.success("New transaction added successfully.");
+            toast.success("New folder added successfully.");
             setIsAdded(true);
 
             setTimeout(() => {
@@ -44,7 +44,7 @@ function AddFolder({ showModal, setShowModal }) {
 
         } catch (error) {
             console.log(error);
-            toast.error("Error in adding transaction. Try again later.");
+            toast.error("Error in adding new folder. Try again later.");
         } finally {
             setLoading(false);
         }

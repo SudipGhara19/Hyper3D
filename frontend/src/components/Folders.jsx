@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import AddFolder from './modals/folderModals/AddFolder';
+import AddFolder from './modals/foldersModals/AddFolder';
+import { useNavigate } from 'react-router-dom';
 
 function Folders() {
 
   const { folders } = useSelector((state) => state.folders);
 
   const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -24,13 +26,13 @@ function Folders() {
                 alt="create-f" />
             </div>
             {/* Add 3D Model */}
-            <div className='flex gap-4 items-center justify-start py-3 md:py-5 px-4 md:px-10 bg-blue-200 rounded-lg'>
+            {/* <div className='flex gap-4 items-center justify-start py-3 md:py-5 px-4 md:px-10 bg-blue-200 rounded-lg'>
               <p className='text-base md:text-xl text-zinc-700 font-bold'>Add Model: </p>
               <img
-                className='w-12 md:w-16 cursor-pointer transform transition-transform ease-in-out duration-300 hover:scale-110'
+                className='w-16 md:w-20 cursor-pointer transform transition-transform ease-in-out duration-300 hover:scale-110'
                 src="/3d-icon.webp"
                 alt="add-f" />
-            </div>
+            </div> */}
           </div>
 
 
@@ -49,6 +51,7 @@ function Folders() {
                       {f.models.length}
                     </p>
                     <img
+                      onClick={() => navigate(`/?tab=${f.name}`)}
                       className="w-full cursor-pointer transform transition-transform ease-in-out duration-300 hover:scale-110"
                       src="/folder.webp"
                       alt={f.name}
