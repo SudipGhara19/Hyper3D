@@ -6,6 +6,7 @@ import errorMiddleware from './src/middlewares/errorMiddleware.js';
 import authRoutes from './src/routes/auth.routes.js';
 import folderRoutes from './src/routes/folder.routes.js';
 import fileRoutes from './src/routes/file.routes.js';
+import modelRoutes from './src/routes/model.routes.js';
 
 dotenv.config();
 const app = express();
@@ -63,6 +64,7 @@ mongoose.connect(process.env.DATABASE_URL)
 app.use('/api/auth', authRoutes); // auth routes
 app.use('/api/folder', folderRoutes); //folder routes
 app.use('/api/file', fileRoutes); // file routes
+app.use('/api/model', modelRoutes); //model routes
 
 //-------------------------------Error Middleware--------------------------------------
 app.use(errorMiddleware);

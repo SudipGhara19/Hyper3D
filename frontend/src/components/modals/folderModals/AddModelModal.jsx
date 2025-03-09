@@ -11,24 +11,37 @@ import { useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ErrorBoundary from '../../../utils/ErrorBoundary.jsx';
+import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import { createModel } from '../../../api/modelService.js';
+import { setFoldersData } from '../../../redux/folderSlice.js';
 
 
 function ModelViewer({ fileUrl }) {
+  const modelRef = useRef();
+
   const fileExtension = fileUrl.split('.').pop().toLowerCase();
 
   const gltf = useLoader(GLTFLoader, fileUrl, (loader) => {
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('/draco/');  // Ensure DRACO files are in `/public/draco`
+    dracoLoader.setDecoderPath('/draco/');
     loader.setDRACOLoader(dracoLoader);
 
-    // Only apply `.setPath()` logic for `.gltf` models (not `.glb`)
     if (fileExtension === 'gltf') {
       loader.setPath(fileUrl.substring(0, fileUrl.lastIndexOf('/') + 1));
     }
   });
 
-  return <primitive object={gltf.scene} scale={2} />;
+  // Auto-rotation animation
+  useFrame(() => {
+    if (modelRef.current) {
+      modelRef.current.rotation.y += 0.002; // Slower rotation for better visual effect
+    }
+  });
+
+  return <primitive ref={modelRef} object={gltf.scene} scale={0.8} position={[0, -1, 0]} />;
 }
+
 
 function AddModelModal({ showModal, setShowModal, fName }) {
   const [name, setName] = useState('');
@@ -76,17 +89,34 @@ function AddModelModal({ showModal, setShowModal, fName }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name.trim() || !file) {
-      toast.error("Please provide a valid name and upload a model file.");
+    if (!name.trim() || !file || !description) {
+      toast.error("Please provide a valid name, description and upload a model file.");
       return;
     }
 
     setLoading(true);
 
     try {
+      const modelData = {
+        name,
+        description,
+        modelUrl,
+        folderName: fName
+      }
 
+      const response = await createModel(modelData);
 
-      ;
+      if (response?.error) {
+        return;
+      }
+
+      dispatch(setFoldersData(response.folders));
+      toast.success("New model data added successfully.");
+      setIsAdded(true);
+
+      setTimeout(() => {
+        setShowModal(false);
+      }, 1300);
     } catch (error) {
       console.error("Error adding model:", error);
     } finally {
@@ -110,7 +140,7 @@ function AddModelModal({ showModal, setShowModal, fName }) {
           Add New Model
         </h2>
 
-        <form onSubmit={handleSubmit}>
+        <form >
           {/* Name Input */}
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-1">Model Name</label>
@@ -137,17 +167,28 @@ function AddModelModal({ showModal, setShowModal, fName }) {
 
           {/* Model Preview */}
           {modelUrl && (
-            <div className="w-full h-64 border rounded-lg overflow-hidden">
+            <div className="w-full h-36 border rounded-lg overflow-hidden">
               <ErrorBoundary>
-                <Canvas camera={{ position: [0, 0, 3] }}>
+                <Canvas
+                  camera={{
+                    position: [0, 2, 8],  // Moved camera further back for zoomed-out view
+                    fov: 50,              // Adjusted field of view for better perspective
+                  }}
+                >
                   <ambientLight intensity={0.5} />
                   <directionalLight position={[1, 1, 1]} intensity={1} />
                   <ModelViewer fileUrl={modelUrl} />
-                  <OrbitControls />
+                  <OrbitControls
+                    enableZoom={true}
+                    autoRotate={false}
+                    maxPolarAngle={Math.PI / 2}  // Prevents the user from viewing from below
+                  />
                 </Canvas>
               </ErrorBoundary>
             </div>
           )}
+
+
 
           {/* Progress Bar */}
           {progress > 0 && (
@@ -164,7 +205,7 @@ function AddModelModal({ showModal, setShowModal, fName }) {
 
           {/* Model File Input */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-1">Upload Model (.glb or .gltf)</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Upload Model (.glb or .gltf, max 10mb)</label>
             <input
               type="file"
               accept=".glb,.gltf"
@@ -183,8 +224,9 @@ function AddModelModal({ showModal, setShowModal, fName }) {
               </div>
             ) : (
               <button
-                type="submit"
-                disabled={loading}
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || modelUrl === ""}
                 className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-800 transition"
               >
                 {loading ? (
