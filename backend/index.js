@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 import authRoutes from './src/routes/auth.routes.js';
 import folderRoutes from './src/routes/folder.routes.js';
+import fileRoutes from './src/routes/file.routes.js';
 
 dotenv.config();
 const app = express();
@@ -26,8 +27,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '10mb' }));
-
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 // Manual CORS Middleware (if needed)
 app.use((req, res, next) => {
     const origin = req.headers.origin;
@@ -59,8 +60,9 @@ mongoose.connect(process.env.DATABASE_URL)
 
 
 //----------------------------------- Routes -----------------------------------------
-app.use('/api/auth', authRoutes);
-app.use('/api/folder', folderRoutes);
+app.use('/api/auth', authRoutes); // auth routes
+app.use('/api/folder', folderRoutes); //folder routes
+app.use('/api/file', fileRoutes); // file routes
 
 //-------------------------------Error Middleware--------------------------------------
 app.use(errorMiddleware);

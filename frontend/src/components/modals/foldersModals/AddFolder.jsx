@@ -18,7 +18,8 @@ function AddFolder({ showModal, setShowModal }) {
     const dispatch = useDispatch();
 
     //------------------------- Adding Folder Func --------------------
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
             setLoading(true);
 
