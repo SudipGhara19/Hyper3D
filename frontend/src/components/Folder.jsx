@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import DeleteFolderModal from './modals/folderModals/DeleteFolderModal';
 import AddModelModal from './modals/folderModals/AddModelModal';
+import ModelCards from './ModelCards';
 
 function Folder() {
   const location = useLocation();
@@ -35,14 +36,14 @@ function Folder() {
             <div className='flex gap-4 items-center justify-start py-3 md:py-5 px-4 md:px-10 bg-blue-200 rounded-lg'>
               <p className='text-base md:text-xl text-zinc-700 font-bold'>Add Model: </p>
               <img
-              onClick={() => setShowAddModel(true)}
+                onClick={() => setShowAddModel(true)}
                 className='w-16 md:w-20 cursor-pointer transform transition-transform ease-in-out duration-300 hover:scale-110'
                 src="/3d-icon.webp"
                 alt="add-f" />
             </div>
           </div>
 
-          <p>{`models: ${folderData?.models?.length}`}</p>
+          <ModelCards models={folderData.models} fName={folderData.name} />
         </div>
       </div>
 

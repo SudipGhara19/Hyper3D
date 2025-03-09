@@ -54,3 +54,46 @@ export const createModelData = async (req, res, next) => {
         next(new ErrorHandler(500, "Internal server error"));
     }
 };
+
+
+// -------------------- Delete Model Data --------------------
+export const deleteModelData = async (req, res, next) => {
+    const userId  = req.user.userId;
+    const  modelSlug  = req.query.slug;
+
+    if (!modelSlug?.trim()) {
+        return next(new ErrorHandler(400, "Model slug is required."));
+    }
+
+    try {
+        const user = await User.findOne({ _id: userId });
+
+        if (!user) {
+            return next(new ErrorHandler(404, "User not found."));
+        }
+
+        let modelDeleted = false;
+
+        user.folders.forEach(folder => {
+            const modelIndex = folder.models.findIndex(m => m.slug === modelSlug);
+            if (modelIndex !== -1) {
+                folder.models.splice(modelIndex, 1); // Remove model
+                modelDeleted = true;
+            }
+        });
+
+        if (!modelDeleted) {
+            return next(new ErrorHandler(404, "Model not found."));
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Model deleted successfully",
+            folders: user.folders
+        });
+    } catch (error) {
+        next(new ErrorHandler(500, "Internal server error"));
+    }
+};
